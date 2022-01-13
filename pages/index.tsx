@@ -25,7 +25,7 @@ const Home = ({feed}) => {
         <div className="mt-10">
         {feed.map((recipe: any)=> {
           return (
-            <div className="mt-2">
+            <div key={`${recipe.id}`} className="mt-2">
               <h1><a href={`/recipe/${recipe.id}`}>{recipe.title}</a></h1>
             </div>
           )
