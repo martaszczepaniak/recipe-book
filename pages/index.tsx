@@ -1,8 +1,15 @@
-import type { NextPage } from 'next'
+import type {GetStaticProps, NextPage} from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
+import prisma from '../lib/prisma';
 
-const Home: NextPage = () => {
+export const getServerSideProps: GetStaticProps = async () => {
+  const feed = await prisma.recipe.findMany();
+  return { props: { feed } };
+};
+
+// @ts-ignore
+const Home = ({feed}) => {
   return (
     <div className={styles.container}>
       <Head>
@@ -15,6 +22,15 @@ const Home: NextPage = () => {
         <h1 className={styles.title}>
           Welcome to my Recipe Book!
         </h1>
+        <div className="mt-10">
+        {feed.map((recipe: any)=> {
+          return (
+            <div className="mt-2">
+              <h1><a href={`/recipe/${recipe.id}`}>{recipe.title}</a></h1>
+            </div>
+          )
+        })}
+        </div>
       </main>
     </div>
   )
