@@ -2,14 +2,29 @@ import type {GetStaticProps, NextPage} from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import prisma from '../lib/prisma';
+import {IIngredient} from "pages/recipe/[id]";
 
 export const getServerSideProps: GetStaticProps = async () => {
   const feed = await prisma.recipe.findMany();
-  return { props: { feed } };
+
+  const filteredRecipes = await prisma.recipe.findMany({
+    where: {
+      ingredients: {
+        some: {
+          name: {
+            contains: 'eggs',
+          },
+        },
+      },
+    },
+  });
+
+  return { props: { feed, filteredRecipes } };
 };
 
 // @ts-ignore
-const Home = ({feed}) => {
+const Home = ({feed, filteredRecipes}) => {
+  console.log(filteredRecipes)
   return (
     <div className={styles.container}>
       <Head>
@@ -31,6 +46,12 @@ const Home = ({feed}) => {
           )
         })}
         </div>
+        <p>Z jajkami:</p>
+        {filteredRecipes.map((recipe: any) => {
+          return <div key={`${recipe.id}`} className="mt-2">
+            <h1><a href={`/recipe/${recipe.id}`}>{recipe.title}</a></h1>
+          </div>
+        })}
       </main>
     </div>
   )
